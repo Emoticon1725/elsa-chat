@@ -14,7 +14,7 @@ const Navbar = () => {
   return (
     <div className="navbar fixed z-10 bg-primary text-primary-content">
       <div className="containerWrap flex justify-between">
-        <a className="btn btn-ghost text-xl">Secret Garden</a>
+        <a className="btn btn-ghost text-xl">秘密花园</a>
         {currentUser ? <button onClick={handleLogout}>Logout</button> : ""}
       </div>
     </div>

@@ -1,36 +1,93 @@
-import { useEffect } from "react";
-import { UserAuth } from "../context/AuthContext";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { UserAuth,  } from "../context/AuthContext";
+
+
 
 const Login = () => {
   const navigate = useNavigate();
-  const { currentUser, signinWithGoogle } = UserAuth();
-  console.log(currentUser)
-  
+  const { currentUser, signinWithEmail, signupWithEmail } = UserAuth();
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
+  const [isSignUp, setIsSignUp] = useState(false); // State to toggle between login and signup
 
-  const handleLogin = async () => {
+  const handleAuth = async (e) => {
+    e.preventDefault();
     try {
-      await signinWithGoogle();
-    } catch(error) {
-      console.log(e)
+      if (isSignUp) {
+        await signupWithEmail(email, password);
+      } else {
+        await signinWithEmail(email, password);
+      }
+    } catch (error) {
+      setError("Failed to authenticate. Please check your credentials and try again.");
+      console.log(error);
     }
-  }
+  };
 
   useEffect(() => {
-    if(currentUser) {
-      navigate("/chat")
+    if (currentUser) {
+      navigate("/chat");
     }
   }, [currentUser]);
 
   return (
     <div className="hero bg-base-200 min-h-screen">
-      <div className="hero-content text-center">
-        <div className="max-w-md">
-          <h1 className="text-5xl font-bold">Hello My Queen</h1>
+      <div className="hero-content flex-col lg:flex-row-reverse">
+        <div className="text-center lg:text-left">
+          <h1 className="text-5xl font-bold">{isSignUp ? "Sign up now!" : "Login now!"}</h1>
           <p className="py-6">
-            Let's chat together 
+          进来聊聊吧，我做了这个让你和我一起享用
           </p>
-          <button onClick={handleLogin} className="btn btn-primary">Login with Google</button>
+        </div>
+        <div className="card bg-base-100 w-full max-w-sm shrink-0 shadow-2xl">
+          <form className="card-body" onSubmit={handleAuth}>
+            <div className="form-control">
+              <label className="label">
+                <span className="label-text">Email</span>
+              </label>
+              <input
+                type="email"
+                placeholder="email"
+                className="input input-bordered"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+              />
+            </div>
+            <div className="form-control">
+              <label className="label">
+                <span className="label-text">password</span>
+              </label>
+              <input
+                type="password"
+                placeholder="password"
+                className="input input-bordered"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+              />
+              {!isSignUp && (
+                <label className="label">
+                  <a href="#" className="label-text-alt link link-hover">Forgot password?</a>
+                </label>
+              )}
+            </div>
+            {error && <p className="text-red-500">{error}</p>}
+            <div className="form-control mt-6">
+              <button type="submit" className="btn btn-primary">{isSignUp ? "Sign Up" : "Login"}</button>
+            </div>
+            <div className="form-control mt-2">
+              <button
+                type="button"
+                className="btn btn-outline"
+                onClick={() => setIsSignUp(!isSignUp)}
+              >
+                {isSignUp ? "Already have an account? Log in" : "Need an account? Sign up"}
+              </button>
+            </div>
+          </form>
         </div>
       </div>
     </div>
